@@ -5,7 +5,7 @@ use base qw/Catalyst::Base Class::DBI/;
 use NEXT;
 use Class::DBI::Loader;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 __PACKAGE__->mk_accessors('loader');
 
@@ -14,6 +14,9 @@ __PACKAGE__->mk_accessors('loader');
 Catalyst::Model::CDBI - CDBI Model Class
 
 =head1 SYNOPSIS
+
+    # use the helper
+    create model CDBI CDBI dsn user password
 
     # lib/MyApp/Model/CDBI.pm
     package MyApp::Model::CDBI;

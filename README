@@ -2,6 +2,9 @@ NAME
     Catalyst::Model::CDBI - CDBI Model Class
 
 SYNOPSIS
+        # use the helper
+        create model CDBI CDBI dsn user password
+
         # lib/MyApp/Model/CDBI.pm
         package MyApp::Model::CDBI;
 

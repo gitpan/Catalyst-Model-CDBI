@@ -1,4 +1,7 @@
 Revision history for Perl extension Catalyst::Model::CDBI.
 
+0.02  Tue Mar 01 10:00:00 2005
+        - added helper
+
 0.01  Fri Jan 28 22:00:00 2005
         - first release
