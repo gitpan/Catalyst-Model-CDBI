@@ -1,9 +1,7 @@
 package Catalyst::Helper::Model::CDBI;
 
 use strict;
-use IO::File;
 use Class::DBI::Loader;
-use File::Path;
 
 =head1 NAME
 
@@ -34,8 +32,9 @@ sub mk_compclass {
     my $class   = $helper->{class};
     my $options = '';
     $options = 'AutoCommit => 1 ' if $dsn =~ /pg/i;
-    my $comp = IO::File->new("> $file") or die qq/Couldn't open "$file", "$!"/;
-    print $comp <<"EOF";
+    $helper->{classes} = [];
+    push( @{ $helper->{classes} }, $class )
+      if $helper->mk_file( $file, <<"EOF");
 package $class;
 
 use strict;
@@ -74,7 +73,7 @@ the same terms as perl itself.
 
 1;
 EOF
-    return unless $dsn;
+    return 1 unless $dsn;
     my $loader = Class::DBI::Loader->new(
         dsn       => $dsn,
         user      => $user,
@@ -84,17 +83,13 @@ EOF
 
     my $path = $file;
     $path =~ s/\.pm$//;
-    mkpath $path;
+    $helper->mk_dir($path);
 
-    $helper->{classes} = [ $loader->classes ];
     for my $c ( $loader->classes ) {
         $c =~ /\W*(\w+)$/;
         my $f = $1;
         my $p = "$path/$f.pm";
-
-        my $subclass = IO::File->new("> $p")
-          or die qq/Couldn't open "$p", "$!"/;
-        print $subclass <<"EOF";
+        push( @{ $helper->{classes} }, $c ) if $helper->mk_file( $p, <<"EOF");
 package $c;
 
 use strict;
@@ -125,6 +120,7 @@ the same terms as perl itself.
 1;
 EOF
     }
+    return 1;
 }
 
 =head3 mk_compclass
@@ -136,30 +132,17 @@ sub mk_comptest {
     my $class = $helper->{class};
     my $app   = $helper->{app};
     my $test  = $helper->{test};
-    my $t     = IO::File->new("> $test") or die qq/Couldn't open "$test", "$!"/;
-    print $t <<"EOF";
-use Test::More tests => 2;
-use_ok( Catalyst::Test, '$app' );
-use_ok('$class');
-EOF
-    my $name = $helper->{name};
-    my $type = $helper->{type};
-    my $dir  = $helper->{test_dir};
-    $test =~ /\/(\d+)\w+\.t$/;
-    my $num = $1;
+    my $name  = $helper->{name};
+    my $type  = $helper->{type};
 
     for my $c ( @{ $helper->{classes} } ) {
-        $num++;
-        $num = sprintf '%02d', $num;
         $c =~ /\:\:(\w+)$/;
         my $table  = $1;
-        my $prefix = "$name\::$table";
+        my $prefix = "$type\::$name\::$table";
         $prefix =~ s/::/_/g;
         $prefix = lc $prefix;
-        my $tname = lc( $num . $type . '_' . $prefix . '.t' );
-        my $file  = "$dir/$tname";
-        my $t = IO::File->new("> $file") or die qq/Couldn't open "$file", "$!"/;
-        print $t <<"EOF";
+        my $test = $helper->next_test($prefix);
+        $helper->mk_file( $test, <<"EOF");
 use Test::More tests => 2;
 use_ok( Catalyst::Test, '$app' );
 use_ok('$c');
