@@ -138,9 +138,10 @@ sub mk_comptest {
     my $type  = $helper->{type};
 
     for my $c ( @{ $helper->{classes} } ) {
-        $c =~ /\:\:(\w+)$/;
-        my $table  = $1;
-        my $prefix = "$name\::$table";
+        $c =~ /\:\:(\w+)\:\:(\w+)$/;
+        my $prefix;
+        unless ( $1 eq 'M' ) { $prefix = "$name\::$2" }
+        else { $prefix = $2 }
         $prefix =~ s/::/_/g;
         $prefix = lc $prefix;
         my $test = $helper->next_test($prefix);
