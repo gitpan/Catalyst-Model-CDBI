@@ -2,6 +2,7 @@ package Catalyst::Helper::Model::CDBI;
 
 use strict;
 use Class::DBI::Loader;
+use File::Spec;
 
 =head1 NAME
 
@@ -33,8 +34,7 @@ sub mk_compclass {
     my $options = '';
     $options = 'AutoCommit => 1 ' if $dsn =~ /pg/i;
     $helper->{classes} = [];
-    push( @{ $helper->{classes} }, $class )
-      if $helper->mk_file( $file, <<"EOF");
+    $helper->mk_file( $file, <<"EOF");
 package $class;
 
 use strict;
@@ -73,6 +73,7 @@ the same terms as perl itself.
 
 1;
 EOF
+    push( @{ $helper->{classes} }, $class );
     return 1 unless $dsn;
     my $loader = Class::DBI::Loader->new(
         dsn       => $dsn,
@@ -88,8 +89,8 @@ EOF
     for my $c ( $loader->classes ) {
         $c =~ /\W*(\w+)$/;
         my $f = $1;
-        my $p = "$path/$f.pm";
-        push( @{ $helper->{classes} }, $c ) if $helper->mk_file( $p, <<"EOF");
+        my $p = File::Spec->catfile( $path, "$f.pm" );
+        $helper->mk_file( $p, <<"EOF");
 package $c;
 
 use strict;
@@ -119,6 +120,7 @@ the same terms as perl itself.
 
 1;
 EOF
+        push( @{ $helper->{classes} }, $c );
     }
     return 1;
 }
@@ -138,7 +140,7 @@ sub mk_comptest {
     for my $c ( @{ $helper->{classes} } ) {
         $c =~ /\:\:(\w+)$/;
         my $table  = $1;
-        my $prefix = "$type\::$name\::$table";
+        my $prefix = "$name\::$table";
         $prefix =~ s/::/_/g;
         $prefix = lc $prefix;
         my $test = $helper->next_test($prefix);
