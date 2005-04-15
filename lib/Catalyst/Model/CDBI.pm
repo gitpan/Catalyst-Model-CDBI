@@ -5,7 +5,7 @@ use base qw/Catalyst::Base Class::DBI/;
 use NEXT;
 use Class::DBI::Loader;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 __PACKAGE__->mk_accessors('loader');
 
@@ -41,7 +41,13 @@ Catalyst::Model::CDBI - CDBI Model Class
 
 =head1 DESCRIPTION
 
-This is the C<Class::DBI>, C<Class::DBI::Loader> model class.
+This is the C<Class::DBI> model class. It's built on top of 
+C<Class::DBI::Loader>.
+
+=head2 new
+
+Initializes Class::DBI::Loader and loads classes using the class
+config. Also attempts to borg all the classes.
 
 =cut
 
@@ -69,7 +75,7 @@ sub new {
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Class::DBI>
+L<Catalyst>, L<Class::DBI> L<Class::DBI::Loader>
 
 =head1 AUTHOR
 
@@ -77,8 +83,8 @@ Sebastian Riedel, C<sri@cpan.org>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This program is free software, you can redistribute it and/or modify it 
+under the same terms as Perl itself.
 
 =cut
 

@@ -10,7 +10,7 @@ Catalyst::Helper::Model::CDBI - Helper for CDBI Models
 
 =head1 SYNOPSIS
 
-    bin/create model CDBI CDBI dsn user password
+    script/create.pl model CDBI CDBI dsn user password
 
 =head1 DESCRIPTION
 
@@ -18,68 +18,37 @@ Helper for CDBI Model.
 
 =head2 METHODS
 
-=head3 mk_compclass
+=over 4
+
+=item mk_compclass
+
+Reads the database and makes a main model class as well as placeholders
+for each table.
+
+=item mk_comptest
+
+Makes tests for the CDBI Model.
+
+=back 
 
 =cut
 
 sub mk_compclass {
     my ( $self, $helper, $dsn, $user, $pass ) = @_;
-    $dsn  ||= '';
-    $user ||= '';
-    $pass ||= '';
-    my $rel = 0;
-    $rel = 1 if $dsn =~ /sqlite|pg|mysql/i;
-    my $file    = $helper->{file};
-    my $class   = $helper->{class};
-    my $options = '';
-    $options = 'AutoCommit => 1 ' if $dsn =~ /pg/i;
+    $helper->{dsn}  = $dsn  || '';
+    $helper->{user} = $user || '';
+    $helper->{pass} = $pass || '';
+    $helper->{rel} = $dsn =~ /sqlite|pg|mysql/i ? 1 : 0;
+    my $file = $helper->{file};
     $helper->{classes} = [];
-    $helper->mk_file( $file, <<"EOF");
-package $class;
-
-use strict;
-use base 'Catalyst::Model::CDBI';
-
-__PACKAGE__->config(
-    dsn           => '$dsn',
-    user          => '$user',
-    password      => '$pass',
-    options       => { $options},
-    relationships => $rel
-);
-
-=head1 NAME
-
-$class - CDBI Model Component
-
-=head1 SYNOPSIS
-
-    Very simple to use
-
-=head1 DESCRIPTION
-
-Very nice component.
-
-=head1 AUTHOR
-
-Clever guy
-
-=head1 LICENSE
-
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
-
-=cut
-
-1;
-EOF
-    push( @{ $helper->{classes} }, $class );
+    $helper->render_file( 'cdbiclass', $file );
+    #push( @{ $helper->{classes} }, $helper->{class} );
     return 1 unless $dsn;
     my $loader = Class::DBI::Loader->new(
         dsn       => $dsn,
         user      => $user,
         password  => $pass,
-        namespace => $class
+        namespace => $helper->{class}
     );
 
     my $path = $file;
@@ -87,69 +56,28 @@ EOF
     $helper->mk_dir($path);
 
     for my $c ( $loader->classes ) {
-        $c =~ /\W*(\w+)$/;
+        $helper->{tableclass} =~ /\W*(\w+)$/;
         my $f = $1;
         my $p = File::Spec->catfile( $path, "$f.pm" );
-        $helper->mk_file( $p, <<"EOF");
-package $c;
-
-use strict;
-
-=head1 NAME
-
-$c - CDBI Model Component Table Class
-
-=head1 SYNOPSIS
-
-    Very simple to use
-
-=head1 DESCRIPTION
-
-Very nice component.
-
-=head1 AUTHOR
-
-Clever guy
-
-=head1 LICENSE
-
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
-
-=cut
-
-1;
-EOF
+        $helper->render_file( 'tableclass', $p );
         push( @{ $helper->{classes} }, $c );
     }
     return 1;
 }
 
-=head3 mk_compclass
-
-=cut
-
 sub mk_comptest {
     my ( $self, $helper ) = @_;
-    my $class = $helper->{class};
-    my $app   = $helper->{app};
-    my $test  = $helper->{test};
-    my $name  = $helper->{name};
-    my $type  = $helper->{type};
-
+    my $test = $helper->{test};
+    my $name = $helper->{name};
     for my $c ( @{ $helper->{classes} } ) {
-        $c =~ /\:\:(\w+)\:\:(\w+)$/;
+        $helper->{tableclass} =~ /\:\:(\w+)\:\:(\w+)$/;
         my $prefix;
         unless ( $1 eq 'M' ) { $prefix = "$name\::$2" }
         else { $prefix = $2 }
         $prefix =~ s/::/_/g;
         $prefix = lc $prefix;
         my $test = $helper->next_test($prefix);
-        $helper->mk_file( $test, <<"EOF");
-use Test::More tests => 2;
-use_ok( Catalyst::Test, '$app' );
-use_ok('$c');
-EOF
+        $helper->render_file( 'test', $test );
     }
 }
 
@@ -170,3 +98,78 @@ the same terms as perl itself.
 =cut
 
 1;
+__DATA__
+
+__cdbiclass__
+package [% class %];
+
+use strict;
+use base 'Catalyst::Model::CDBI';
+
+__PACKAGE__->config(
+    dsn           => '[% dsn %]',
+    user          => '[% user %]',
+    password      => '[% pass %]',
+    options       => {},
+    relationships => [% rel %]
+);
+
+=head1 NAME
+
+[% class %] - CDBI Model Component
+
+=head1 SYNOPSIS
+
+    Very simple to use
+
+=head1 DESCRIPTION
+
+Very nice component.
+
+=head1 AUTHOR
+
+Clever guy
+
+=head1 LICENSE
+
+This library is free software . You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut
+
+1;
+
+__tableclass__
+package [% tableclass %];
+
+use strict;
+
+=head1 NAME
+
+[% tableclass %] - CDBI Model Component Table Class
+
+=head1 SYNOPSIS
+
+    Very simple to use
+
+=head1 DESCRIPTION
+
+Very nice component.
+
+=head1 AUTHOR
+
+Clever guy
+
+=head1 LICENSE
+
+This library is free software . You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut
+
+1;
+
+__test__
+use Test::More tests => 2;
+use_ok( Catalyst::Test, '[% app %]' );
+use_ok('[% tableclass %]');
