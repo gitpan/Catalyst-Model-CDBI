@@ -56,6 +56,7 @@ sub mk_compclass {
     $helper->mk_dir($path);
 
     for my $c ( $loader->classes ) {
+        $helper->{tableclass} = $c;
         $helper->{tableclass} =~ /\W*(\w+)$/;
         my $f = $1;
         my $p = File::Spec->catfile( $path, "$f.pm" );
@@ -70,6 +71,7 @@ sub mk_comptest {
     my $test = $helper->{test};
     my $name = $helper->{name};
     for my $c ( @{ $helper->{classes} } ) {
+        $helper->{tableclass} = $c;
         $helper->{tableclass} =~ /\:\:(\w+)\:\:(\w+)$/;
         my $prefix;
         unless ( $1 eq 'M' ) { $prefix = "$name\::$2" }

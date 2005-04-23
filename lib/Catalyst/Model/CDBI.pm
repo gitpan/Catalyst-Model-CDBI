@@ -5,7 +5,7 @@ use base qw/Catalyst::Base Class::DBI/;
 use NEXT;
 use Class::DBI::Loader;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 __PACKAGE__->mk_accessors('loader');
 
