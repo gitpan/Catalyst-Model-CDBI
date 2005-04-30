@@ -6,7 +6,7 @@ WriteMakefile(
     PREREQ_PM => {
         Catalyst           => '4.00',
         Class::DBI         => 0,
-        Class::DBI::Loader => 0
+        Class::DBI::Loader => 0.20
     },
     VERSION_FROM => 'lib/Catalyst/Model/CDBI.pm'
 );
