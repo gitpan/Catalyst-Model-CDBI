@@ -76,8 +76,7 @@ sub mk_comptest {
         my $prefix;
         unless ( $1 eq 'M' ) { $prefix = "$name\::$2" }
         else { $prefix = $2 }
-        $prefix =~ s/::/_/g;
-        $prefix = lc $prefix;
+        $prefix =~ s/::/-/g;
         my $test = $helper->next_test($prefix);
         $helper->render_file( 'test', $test );
     }
@@ -94,8 +93,8 @@ Sebastian Riedel, C<sri@oook.de>
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software . You can redistribute it and/or modify
+it under the same terms as perl itself.
 
 =cut
 
@@ -122,25 +121,24 @@ __PACKAGE__->config(
 
 =head1 SYNOPSIS
 
-    Very simple to use
+See L<[% app %]>
 
 =head1 DESCRIPTION
 
-Very nice component.
+CDBI Model Component.
 
 =head1 AUTHOR
 
-Clever guy
+[% author %]
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software . You can redistribute it and/or modify
+it under the same terms as perl itself.
 
 =cut
 
 1;
-
 __tableclass__
 package [% tableclass %];
 
@@ -148,29 +146,28 @@ use strict;
 
 =head1 NAME
 
-[% tableclass %] - CDBI Model Component Table Class
+[% tableclass %] - CDBI Table Class
 
 =head1 SYNOPSIS
 
-    Very simple to use
+See L<[% app %]>
 
 =head1 DESCRIPTION
 
-Very nice component.
+CDBI Table Class.
 
 =head1 AUTHOR
 
-Clever guy
+[% author %]
 
 =head1 LICENSE
 
-This library is free software . You can redistribute it and/or modify it under
-the same terms as perl itself.
+This library is free software . You can redistribute it and/or modify
+it under the same terms as perl itself.
 
 =cut
 
 1;
-
 __test__
 use Test::More tests => 2;
 use_ok( Catalyst::Test, '[% app %]' );

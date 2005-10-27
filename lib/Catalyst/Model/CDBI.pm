@@ -5,7 +5,7 @@ use base qw/Catalyst::Base Class::DBI/;
 use NEXT;
 use Class::DBI::Loader;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 __PACKAGE__->mk_accessors('loader');
 
@@ -52,8 +52,9 @@ config. Also attempts to borg all the classes.
 =cut
 
 sub new {
-    my ( $self, $c ) = @_;
-    $self = $self->NEXT::new($c);
+    my $class = shift;
+    my $self  = $class->NEXT::new( @_ );
+    my $c     = shift;
     $self->{namespace}               ||= ref $self;
     $self->{additional_base_classes} ||= ();
     push @{ $self->{additional_base_classes} }, ref $self;
