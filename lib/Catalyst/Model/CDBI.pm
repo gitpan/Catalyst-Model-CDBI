@@ -5,7 +5,7 @@ use base qw/Catalyst::Base Class::DBI/;
 use NEXT;
 use Class::DBI::Loader;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 __PACKAGE__->mk_accessors('loader');
 
@@ -59,7 +59,9 @@ sub new {
     $self->{additional_base_classes} ||= ();
     push @{ $self->{additional_base_classes} }, ref $self;
     eval { $self->loader( Class::DBI::Loader->new(%$self) ) };
-    if ($@) { $c->log->debug(qq/Couldn't load tables "$@"/) if $c->debug }
+    if ($@) { 
+        Catalyst::Exception->throw( message => $@ );
+    }
     else {
         $c->log->debug(
             'Loaded tables "' . join( ' ', $self->loader->tables ) . '"' )

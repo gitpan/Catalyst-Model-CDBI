@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Model::CDBI.
 
+0.11
+    - Throw an exception during startup if there is an error loading
+      tables.
+
 0.10  Thu Oct 27 17:40:00 2005
 	- Pass all args to constructor ( Fix global config )
 
