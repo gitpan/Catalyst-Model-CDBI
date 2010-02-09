@@ -1,17 +1,24 @@
 package Catalyst::Model::CDBI;
 
+# work around CDBI being incompatible with C3 mro, due to both Ima::DBI and Class::DBI::__::Base
+# inheriting from Class::Data::Inheritable in an inconsistent order.
+BEGIN {
+    require Class::DBI;
+    @Class::DBI::__::Base::ISA = grep { $_ ne 'Class::Data::Inheritable' } @Class::DBI::__::Base::ISA;
+}
+
 use strict;
-use base qw/Catalyst::Base Class::DBI/;
-use NEXT;
+use base qw/Catalyst::Component Class::DBI/;
+use MRO::Compat;
 use Class::DBI::Loader;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 __PACKAGE__->mk_accessors('loader');
 
 =head1 NAME
 
-Catalyst::Model::CDBI - CDBI Model Class
+Catalyst::Model::CDBI - [DEPRECATED] CDBI Model Class
 
 =head1 SYNOPSIS
 
@@ -42,7 +49,12 @@ Catalyst::Model::CDBI - CDBI Model Class
 =head1 DESCRIPTION
 
 This is the C<Class::DBI> model class. It's built on top of 
-C<Class::DBI::Loader>.
+C<Class::DBI::Loader>. C<Class::DBI> is generally not used for new
+applications, with C<DBIx::Class> being preferred instead. As such
+this model is deprecated and (mostly) unmaintained.
+
+It is preserved here for older applications which still need it for
+backwards compatibility.
 
 =head2 new
 
@@ -53,7 +65,7 @@ config. Also attempts to borg all the classes.
 
 sub new {
     my $class = shift;
-    my $self  = $class->NEXT::new( @_ );
+    my $self  = $class->next::method( @_ );
     my $c     = shift;
     $self->{namespace}               ||= ref $self;
     $self->{additional_base_classes} ||= ();
@@ -84,7 +96,16 @@ L<Catalyst>, L<Class::DBI> L<Class::DBI::Loader>
 
 Sebastian Riedel, C<sri@cpan.org>
 
+=head1 CONTRIBUTORS
+
+mst: Matt S Trout C<mst@shadowcat.co.uk>
+
+Arathorn: Matthew Hodgson C<matthew@arasphere.net>
+
 =head1 COPYRIGHT
+
+Copyright (c) 2005 - 2010 the Catalyst::Model::CDBI L</AUTHOR> and
+L</CONTRIBUTORS> as listed above.
 
 This program is free software, you can redistribute it and/or modify it 
 under the same terms as Perl itself.

@@ -2,6 +2,7 @@ package Catalyst::Helper::Model::CDBI;
 
 use strict;
 use Class::DBI::Loader;
+use Class::DBI;
 use File::Spec;
 
 =head1 NAME

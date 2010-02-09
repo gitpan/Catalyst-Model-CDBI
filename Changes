@@ -1,6 +1,12 @@
 Revision history for Perl extension Catalyst::Model::CDBI.
+0.12  Tue Jan 09 02:36:00
+    - Work around MRO problems in CDBI by massaging CDBI::__::Base's ISA
+    - Switch from NEXT to MRO::Compat
+    - Switch from Catalyst::Base to Catalyst::Component
+    - Fix RT#18197
+    - Add deprecation notice.
 
-0.11
+0.11  Wed Nov 23 09:46:00 2005
     - Throw an exception during startup if there is an error loading
       tables.
 
